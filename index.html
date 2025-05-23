@@ -164,11 +164,14 @@
 
         function fillFunctionsListbox() {
             const lbFunctions = document.getElementById('LB_Functions');
-            // Csak akkor töltsük fel, ha üres (ne írjuk felül a visszarakott elemeket)
             if (lbFunctions.options.length === 0) {
+                // Gombok kigyűjtése
+                const buttons = document.querySelectorAll('.button-container button');
                 let options = [];
-                Object.keys(functionMap).forEach(fn => {
-                    options.push({ value: fn, text: fn });
+                buttons.forEach(btn => {
+                    // Az onclick attribútumból kinyerjük a függvény nevét
+                    const fnName = btn.getAttribute('onclick').replace(/\(\).*$/, '');
+                    options.push({ value: fnName, text: btn.innerText });
                 });
                 options.sort((a, b) => a.text.localeCompare(b.text));
                 lbFunctions.innerHTML = '';
