@@ -28,9 +28,32 @@
             box-sizing: border-box;
             border: 1px solid #ccc;
             border-radius: 4px;
+            resize: vertical;
+        }
+        .output-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .output-label-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+        .output-buttons {
+            display: flex;
+            gap: 5px;
         }
         #OutputBox {
             background-color: #f5f5f5;
+            width: 100%;
+            min-height: 200px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
         }
         .button-container {
             display: flex;
@@ -53,6 +76,21 @@
             margin-bottom: 5px;
             font-weight: bold;
         }
+        .input-container {
+            position: relative;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .input-label-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2px;
+        }
+        .input-buttons {
+            display: flex;
+            gap: 5px;
+        }
     </style>
 </head>
 <body>
@@ -60,13 +98,25 @@
         <h1 style="text-align: center;">Online String / Text Converter</h1>
         <p>Simple online text conversion tool: case, array, quotes, line breaks, string array, and other text conversions.</p>
     </header>
-    <div>
-        <label for="InputBox">Input:</label>
+    <div class="input-container">
+        <div class="input-label-bar">
+            <label for="InputBox" style="margin-bottom: 0;">Input:</label>
+            <div class="input-buttons">
+                <button type="button" onclick="clearInput()">Clear</button>
+                <button type="button" onclick="pasteInput()">Paste</button>
+            </div>
+        </div>
         <textarea id="InputBox" class="text-box" placeholder="Type your text..."></textarea>
     </div>
     
-    <div>
-        <label for="OutputBox">Output:</label>
+    <div class="output-container">
+        <div class="output-label-bar">
+            <label for="OutputBox" style="margin-bottom: 0;">Output:</label>
+            <div class="output-buttons">
+                <button type="button" onclick="clearOutput()">Clear</button>
+                <button type="button" onclick="copyOutput()">Copy</button>
+            </div>
+        </div>
         <textarea id="OutputBox" class="text-box" placeholder="Converted text..." readonly></textarea>
     </div>
     
@@ -96,18 +146,34 @@
     </div>
 
     <script>
-        // Függvények listája
+        // Segédfüggvény: minden sor elejéről és végéről levágja a whitespace-et
+        function trimLines(input) {
+            return input
+                .split(/\r?\n/)
+                .map(line => line.trim())
+                .join('\n');
+        }
+
         const functionMap = {
-            toUpperCase: function(input) { return input.toUpperCase(); },
-            toLowerCase: function(input) { return input.toLowerCase(); },
+            toUpperCase: function(input) {
+                input = trimLines(input);
+                return input.toUpperCase();
+            },
+            toLowerCase: function(input) {
+                input = trimLines(input);
+                return input.toLowerCase();
+            },
             capitalizeFirst: function(input) {
+                input = trimLines(input);
                 if (input.length === 0) return '';
                 return input.charAt(0).toUpperCase() + input.slice(1).toLowerCase();
             },
             reverseText: function(input) {
+                input = trimLines(input);
                 return input.split('').reverse().join('');
             },
             stringToStringArray: function(input) {
+                input = trimLines(input);
                 input = input.replace(/`/g, '');
                 input = input.replace(/'/g, "''");
                 let lines = input.split(/\r?\n/);
@@ -118,6 +184,7 @@
                 return lines.join('\n');
             },
             stringArrayToString: function(input) {
+                input = trimLines(input);
                 let lines = input.split(/\r?\n/);
                 lines = lines.map(line => line.replace(/,$/, ''));
                 lines = lines.map(line => line.replace(/^'+|'+$/g, ''));
@@ -125,11 +192,13 @@
                 return lines.join('\n');
             },
             linebreakToComma: function(input) {
-                let lines = input.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+                input = trimLines(input);
+                let lines = input.split(/\r?\n/).filter(line => line.length > 0);
                 return lines.join(',');
             },
             linebreakToCommaAddQuoteStr: function(input) {
-                let lines = input.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+                input = trimLines(input);
+                let lines = input.split(/\r?\n/).filter(line => line.length > 0);
                 lines = lines.map(line => `'${line}'`);
                 return lines.join(',');
             }
@@ -210,29 +279,34 @@
 
         // A már meglévő gombokhoz tartozó függvények (változatlanul)
         function toUpperCase() {
-            const inputText = document.getElementById('InputBox').value;
+            let inputText = document.getElementById('InputBox').value;
+            inputText = trimLines(inputText);
             document.getElementById('OutputBox').value = inputText.toUpperCase();
         }
-        
+
         function toLowerCase() {
-            const inputText = document.getElementById('InputBox').value;
+            let inputText = document.getElementById('InputBox').value;
+            inputText = trimLines(inputText);
             document.getElementById('OutputBox').value = inputText.toLowerCase();
         }
-        
+
         function capitalizeFirst() {
-            const inputText = document.getElementById('InputBox').value;
+            let inputText = document.getElementById('InputBox').value;
+            inputText = trimLines(inputText);
             if (inputText.length === 0) return;
-            document.getElementById('OutputBox').value = 
+            document.getElementById('OutputBox').value =
                 inputText.charAt(0).toUpperCase() + inputText.slice(1).toLowerCase();
         }
-        
+
         function reverseText() {
-            const inputText = document.getElementById('InputBox').value;
+            let inputText = document.getElementById('InputBox').value;
+            inputText = trimLines(inputText);
             document.getElementById('OutputBox').value = inputText.split('').reverse().join('');
         }
 
         function stringToStringArray() {
             let inputText = document.getElementById('InputBox').value;
+            inputText = trimLines(inputText);
             inputText = inputText.replace(/`/g, '');
             inputText = inputText.replace(/'/g, "''");
             let lines = inputText.split(/\r?\n/);
@@ -245,6 +319,7 @@
 
         function stringArrayToString() {
             let inputText = document.getElementById('InputBox').value;
+            inputText = trimLines(inputText);
             let lines = inputText.split(/\r?\n/);
             lines = lines.map(line => line.replace(/,$/, ''));
             lines = lines.map(line => line.replace(/^'+|'+$/g, ''));
@@ -254,17 +329,45 @@
 
         function linebreakToComma() {
             let inputText = document.getElementById('InputBox').value;
-            let lines = inputText.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+            inputText = trimLines(inputText);
+            let lines = inputText.split(/\r?\n/).filter(line => line.length > 0);
             const result = lines.join(',');
             document.getElementById('OutputBox').value = result;
         }
 
         function linebreakToCommaAddQuoteStr() {
             let inputText = document.getElementById('InputBox').value;
-            let lines = inputText.split(/\r?\n/).map(line => line.trim()).filter(line => line.length > 0);
+            inputText = trimLines(inputText);
+            let lines = inputText.split(/\r?\n/).filter(line => line.length > 0);
             lines = lines.map(line => `'${line}'`);
             const result = lines.join(',');
             document.getElementById('OutputBox').value = result;
+        }
+        
+        function clearOutput() {
+            document.getElementById('OutputBox').value = '';
+        }
+
+        function copyOutput() {
+            const outputBox = document.getElementById('OutputBox');
+            outputBox.select();
+            outputBox.setSelectionRange(0, 99999); // For mobile devices
+            document.execCommand('copy');
+            // Visszajelzés (opcionális)
+            // alert('Copied!');
+        }
+
+        function clearInput() {
+            document.getElementById('InputBox').value = '';
+        }
+
+        async function pasteInput() {
+            try {
+                const text = await navigator.clipboard.readText();
+                document.getElementById('InputBox').value = text;
+            } catch (err) {
+                alert('A beillesztés nem sikerült. Engedélyezd a vágólap elérést a böngészőben!');
+            }
         }
         // Később további funkciókat lehet itt hozzáadni
     </script>
